@@ -18,5 +18,7 @@ dependencies {
     // Pedro pathing dependencies bellow
     implementation 'com.pedropathing:revhub:3.0.0'
     implementation 'com.pedropathing:tuning:1.0.0'
+    // Ivy dependecies bellow
+    implementation 'com.pedropathing.ivy:pedro:1.1.1'
 }
 
