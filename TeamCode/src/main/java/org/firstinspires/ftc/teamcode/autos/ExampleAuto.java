@@ -22,23 +22,28 @@ public class ExampleAuto extends OpMode {
     private final PoseFactory poseFactory = PoseFactory.degrees();
 
     // Poses
-    private final Pose startPose = poseFactory.of(72, 9, 90);
-    private final Pose scorePose = poseFactory.of(72, 72, 180);
-    private final Pose parkPose = poseFactory.of(24, 72, 270);
+    private final Pose startPose = poseFactory.of(132, 12, 90);
+    private final Pose pose1 = poseFactory.of(132, 60, 180);
+    private final Pose pose2 = poseFactory.of(84,60,270);
+    private final Pose parkPose = poseFactory.of(84, 12, 270);
 
     // Path methods
-    private Path startToScore() {
-        return line(startPose, scorePose).linear(startPose, scorePose);
+    private Path startToPose1() {
+        return line(startPose, pose1).linear(startPose,pose1);
+    }
+
+    private Path pose1ToPose2(){
+        return line(pose1, pose2).linear(pose1,pose2);
     }
 
     private Path park(){
-        return line(scorePose, parkPose).linear(scorePose, parkPose);
+        return line(pose2,parkPose).linear(pose2,parkPose);
     }
 
     private Command autoRoutine() {
         return sequential(
-                follow(follower, startToScore()),
-                // Add mechanism commands here.
+                follow(follower, startToPose1()),
+                follow(follower, pose1ToPose2()),
                 follow(follower, park())
         );
     }
@@ -59,6 +64,7 @@ public class ExampleAuto extends OpMode {
 
     @Override
     public void loop() {
+
         follower.update();
         Scheduler.execute();
         // add your other methods needed in the loop here
