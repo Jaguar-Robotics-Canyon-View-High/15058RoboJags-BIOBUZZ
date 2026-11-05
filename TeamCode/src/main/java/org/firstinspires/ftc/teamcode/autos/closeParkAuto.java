@@ -14,6 +14,7 @@ import static com.pedropathing.ivy.Scheduler.schedule;
 import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
+import org.firstinspires.ftc.teamcode.ParkPoseStorage;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @Autonomous
@@ -29,7 +30,7 @@ public class closeParkAuto extends OpMode {
     private Path park() {
         return curve(startPose, parkControl1, parkPose).linear(startPose, parkPose);
     }
-    private Command autoRoutine()  {
+    private Command autoRoutine() {
         return sequential(
                 follow(follower, park())
         );
@@ -59,4 +60,8 @@ public class closeParkAuto extends OpMode {
         telemetry.update();
     }
 
+    @Override
+    public void stop() {
+        ParkPoseStorage.parkPose = follower.pose();
+    }
 }

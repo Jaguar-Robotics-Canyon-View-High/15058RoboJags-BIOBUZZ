@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.teleOps;
 
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.drivetrain.DrivePowers;
@@ -8,16 +8,19 @@ import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.Alliance;
+import org.firstinspires.ftc.teamcode.HiveTargeting;
+import org.firstinspires.ftc.teamcode.ParkPoseStorage;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @TeleOp
 public class CompTeleOp extends OpMode {
-    private static final Pose startPose = PoseFactory.degrees().of(132, 9, 90);
-
-
+    // default pose to avoid null errors
+    private static final Pose startPose = PoseFactory.degrees().of(0, 0, 0);
     private Alliance allianceColor = Alliance.NONE;
     private Follower follower;
     private HiveTargeting hiveTargeting;
+
     @Override
     public void init() {
         hiveTargeting = new HiveTargeting();
@@ -37,7 +40,11 @@ public class CompTeleOp extends OpMode {
         telemetry.update();
     }
     @Override
-    public void start() {telemetry.addData("Match Started! Alliance locked", allianceColor);}
+    public void start() {
+        telemetry.addData("Match Started! Alliance locked", allianceColor);
+        follower.setPose(ParkPoseStorage.parkPose);
+        follower.update();
+    }
     @Override
     public void loop() {
         double robotHeading = follower.pose().heading();
@@ -52,7 +59,7 @@ public class CompTeleOp extends OpMode {
         );
         ManualDrive.driveOrHold(follower, powers);
         follower.update();
-        hiveTargeting.outputTelementry(telemetry);
+        hiveTargeting.outputTelemetry(telemetry);
 
         Pose robotPose = follower.pose();
         telemetry.addData("Robot X", robotPose.x());

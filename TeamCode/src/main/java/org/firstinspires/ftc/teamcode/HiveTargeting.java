@@ -9,18 +9,18 @@ public class HiveTargeting {
     private static final double FIELD_CENTER = 72;
     private static final double HIVE_OFFSET_X = 12.75; // all hive buckets are 12.75” left/right from center field
     private static final double HIVE_OFFSET_Y = 19.75; // all hive buckets are 19.75” forward/back from center field
-    private static final Pose hiveBlueAudience = PoseFactory.degrees().of(FIELD_CENTER + HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
-    private static final Pose hiveBlueScoring = PoseFactory.degrees().of(FIELD_CENTER + HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
+    // private static final Pose hiveBlueAudience = PoseFactory.degrees().of(FIELD_CENTER + HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
+    // private static final Pose hiveBlueScoring = PoseFactory.degrees().of(FIELD_CENTER + HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
     private static final Pose hiveRedScoring = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
     private static final Pose hiveRedAudience = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
     private double lastAngleToTarget;
 
     public double calculateAngleToClosestTarget(Pose robotPose, Alliance alliance) {
-        double hiveBlueAudienceDistance = calculateDistanceToTarget(robotPose, hiveBlueAudience);
-        double hiveBlueScoringDistance = calculateDistanceToTarget(robotPose, hiveBlueScoring);
+        // double hiveBlueAudienceDistance = calculateDistanceToTarget(robotPose, hiveBlueAudience);
+        // double hiveBlueScoringDistance = calculateDistanceToTarget(robotPose, hiveBlueScoring);
         double hiveRedScoringDistance = calculateDistanceToTarget(robotPose, hiveRedScoring);
         double hiveRedAudienceDistance = calculateDistanceToTarget(robotPose, hiveRedAudience);
-
+        /*
         Pose target = null;
         if (alliance == Alliance.BLUE) {
             if (hiveBlueScoringDistance < hiveBlueAudienceDistance) {
@@ -35,11 +35,18 @@ public class HiveTargeting {
                 target = hiveRedScoring;
             }
         }
+        */
+        Pose target;
+        if (hiveRedAudienceDistance < hiveRedScoringDistance) {
+            target = hiveRedAudience;
+        } else {
+            target = hiveRedScoring;
+        }
         lastAngleToTarget = calculateAngleToTarget(robotPose, target);
         return lastAngleToTarget;
     }
 
-    public void outputTelementry(Telemetry telemetry) {
+    public void outputTelemetry(Telemetry telemetry) {
         telemetry.addData("Target Heading", lastAngleToTarget);
     }
 
