@@ -63,5 +63,6 @@ public class closeParkAuto extends OpMode {
     @Override
     public void stop() {
         ParkPoseStorage.parkPose = follower.pose();
+        //set the breaks on the motors
     }
 }

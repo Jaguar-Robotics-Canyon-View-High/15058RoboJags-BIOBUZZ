@@ -53,8 +53,8 @@ public class CompTeleOp extends OpMode {
         }
         DrivePowers powers = ManualDrive.fieldCentric(
                 -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
                 robotHeading
         );
         ManualDrive.driveOrHold(follower, powers);
