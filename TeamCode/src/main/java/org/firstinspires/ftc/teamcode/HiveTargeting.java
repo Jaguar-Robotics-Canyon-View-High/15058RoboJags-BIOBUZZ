@@ -9,73 +9,45 @@ public class HiveTargeting {
     private static final double FIELD_CENTER = 72;
     private static final double HIVE_OFFSET_X = 12.75; // all hive buckets are 12.75” left/right from center field
     private static final double HIVE_OFFSET_Y = 19.75; // all hive buckets are 19.75” forward/back from center field
-    // private static final Pose hiveBlueAudience = PoseFactory.degrees().of(FIELD_CENTER + HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
-    // private static final Pose hiveBlueScoring = PoseFactory.degrees().of(FIELD_CENTER + HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
-    private static final Pose hiveRedScoring = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
-    private static final Pose hiveRedAudience = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
-    private double lastAngleToTarget;
+    private static final Pose hiveScoring = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
+    private static final Pose hiveAudience = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
+    private static final double TURN_KP = 1.0; // tune this
+    private static final double MAX_TURN_POWER = 0.8;
+    private static final double HEADING_TOLERANCE = Math.toRadians(1.5);
+    private double lastFieldHeadingToTarget; // radians
 
-    public double calculateAngleToClosestTarget(Pose robotPose, Alliance alliance) {
-        // double hiveBlueAudienceDistance = calculateDistanceToTarget(robotPose, hiveBlueAudience);
-        // double hiveBlueScoringDistance = calculateDistanceToTarget(robotPose, hiveBlueScoring);
-        double hiveRedScoringDistance = calculateDistanceToTarget(robotPose, hiveRedScoring);
-        double hiveRedAudienceDistance = calculateDistanceToTarget(robotPose, hiveRedAudience);
-        /*
-        Pose target = null;
-        if (alliance == Alliance.BLUE) {
-            if (hiveBlueScoringDistance < hiveBlueAudienceDistance) {
-                target = hiveBlueScoring;
-            } else {
-                target = hiveBlueAudience;
-            }
-        } else if (alliance == Alliance.RED) {
-            if (hiveRedAudienceDistance < hiveRedScoringDistance) {
-                target = hiveRedAudience;
-            } else {
-                target = hiveRedScoring;
-            }
+    // Turn power (-MAX..+MAX) that rotates the robot's front toward the closest hive.
+    public double calculateTurnPowerToClosestTarget(Pose robotPose) {
+        Pose target = closestTarget(robotPose);
+        lastFieldHeadingToTarget = Math.atan2(
+                target.y() - robotPose.y(),
+                target.x() - robotPose.x());
+
+        double error = wrapAngle(lastFieldHeadingToTarget - robotPose.heading());
+        if (Math.abs(error) < HEADING_TOLERANCE) {
+            return 0;
         }
-        */
-        Pose target;
-        if (hiveRedAudienceDistance < hiveRedScoringDistance) {
-            target = hiveRedAudience;
-        } else {
-            target = hiveRedScoring;
-        }
-        lastAngleToTarget = calculateAngleToTarget(robotPose, target);
-        return lastAngleToTarget;
+        double power = TURN_KP * error;
+        return Math.max(-MAX_TURN_POWER, Math.min(MAX_TURN_POWER, power));
     }
 
     public void outputTelemetry(Telemetry telemetry) {
-        telemetry.addData("Target Heading", lastAngleToTarget);
+        telemetry.addData("Target Field Heading (deg)", Math.toDegrees(lastFieldHeadingToTarget));
     }
 
-    private double calculateAngleToTarget(Pose robotPose, Pose targetPose) {
-        // Find the absolute heading (angle) of our target using atan2
-        double deltaX = targetPose.x() - robotPose.x();
-        double deltaY = targetPose.y() - robotPose.y();
-        double absoluteTargetHeading = Math.atan2(deltaY, deltaX);
-
-        // Find the relative target heading from our robot heading
-        double relativeTargetHeading = absoluteTargetHeading - robotPose.heading();
-
-        // Wrap relative heading between -180 and +180
-        while (relativeTargetHeading > Math.PI) relativeTargetHeading -= 2 * Math.PI;
-        while (relativeTargetHeading < -Math.PI) relativeTargetHeading += 2 * Math.PI;
-
-        // Add 90 degrees because forward on our turret is 90 degrees
-        double turretAngleRad = (Math.PI / 2.0) + relativeTargetHeading;
-
-        // Keep the final turret angle between 0 and 360 degrees
-        double TWO_PI = 2.0 * Math.PI;
-        turretAngleRad = (turretAngleRad % TWO_PI + TWO_PI) % TWO_PI;
-
-        return Math.toDegrees(turretAngleRad);
-
+    private Pose closestTarget(Pose robotPose) {
+        double scoring = calculateDistanceToTarget(robotPose, hiveScoring);
+        double audience = calculateDistanceToTarget(robotPose, hiveAudience);
+        return (audience < scoring) ? hiveAudience : hiveScoring;
     }
 
     private double calculateDistanceToTarget(Pose robotPose, Pose targetPose) {
-        // The distance is just the hypotenuse of our right triangle
         return Math.hypot(targetPose.x() - robotPose.x(), targetPose.y() - robotPose.y());
+    }
+
+    private static double wrapAngle(double angle) {
+        while (angle > Math.PI) angle -= 2 * Math.PI;
+        while (angle < -Math.PI) angle += 2 * Math.PI;
+        return angle;
     }
 }

@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Alliance;
 import org.firstinspires.ftc.teamcode.AxonServo;
 import org.firstinspires.ftc.teamcode.HiveTargeting;
 import org.firstinspires.ftc.teamcode.ParkPoseStorage;
@@ -63,7 +62,7 @@ public class HiveFinderTestOpMode1 extends OpMode {
         telemetry.addData("Robot X", robotPose.x());
         telemetry.addData("Robot Y", robotPose.y());
         telemetry.addData("Robot Heading", Math.toDegrees(robotPose.heading()));
-        double angleToTarget = hiveTargeting.calculateAngleToClosestTarget(robotPose, Alliance.RED);
+        double angleToTarget = hiveTargeting.calculateTurnPowerToClosestTarget(robotPose);
         hiveTargeting.outputTelemetry(telemetry);
         servo.setTargetAngle(angleToTarget);
     }
