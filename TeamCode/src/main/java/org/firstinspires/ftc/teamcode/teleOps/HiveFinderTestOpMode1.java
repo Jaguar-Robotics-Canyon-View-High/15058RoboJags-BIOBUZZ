@@ -62,7 +62,7 @@ public class HiveFinderTestOpMode1 extends OpMode {
         telemetry.addData("Robot X", robotPose.x());
         telemetry.addData("Robot Y", robotPose.y());
         telemetry.addData("Robot Heading", Math.toDegrees(robotPose.heading()));
-        double angleToTarget = hiveTargeting.calculateTurnPowerToClosestTarget(robotPose);
+        double angleToTarget = hiveTargeting.calculateAngleToClosestTarget(robotPose);
         hiveTargeting.outputTelemetry(telemetry);
         servo.setTargetAngle(angleToTarget);
     }
