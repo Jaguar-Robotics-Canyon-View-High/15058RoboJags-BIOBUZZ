@@ -13,11 +13,18 @@ public class HiveTargeting {
     private static final Pose hiveScoring = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER + HIVE_OFFSET_Y, 0);
     private static final Pose hiveAudience = PoseFactory.degrees().of(FIELD_CENTER - HIVE_OFFSET_X, FIELD_CENTER - HIVE_OFFSET_Y, 0);
     private double lastAngleToTarget;
+    private double lastDistanceToTarget;
 
     public double calculateAngleToClosestTarget(Pose robotPose) {
         Pose target = closestTarget(robotPose);
         lastAngleToTarget = calculateAngleToTarget(robotPose, target);
         return lastAngleToTarget;
+    }
+
+    public double calculateDistanceToClosestTarget(Pose robotPose) {
+        Pose target = closestTarget(robotPose);
+        lastDistanceToTarget = calculateDistanceToTarget(robotPose, target);
+        return lastDistanceToTarget;
     }
 
     private Pose closestTarget(Pose robotPose) {
@@ -28,6 +35,7 @@ public class HiveTargeting {
 
     public void outputTelemetry(Telemetry telemetry) {
         telemetry.addData("Target Heading", lastAngleToTarget);
+        telemetry.addData("Target Distance", lastDistanceToTarget);
     }
 
     private double calculateAngleToTarget(Pose robotPose, Pose targetPose) {

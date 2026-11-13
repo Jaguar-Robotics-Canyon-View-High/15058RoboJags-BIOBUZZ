@@ -11,19 +11,22 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.HiveTargeting;
 import org.firstinspires.ftc.teamcode.ParkPoseStorage;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
+import org.firstinspires.ftc.teamcode.OtherHardware;
 
 @SuppressWarnings("unused")
 @TeleOp
 public class CompTeleOp extends OpMode {
-    // default pose to avoid null errors
     private final PIDController headingController = new PIDController(2.0, 0.0, 0.1);
     private Follower follower;
     private HiveTargeting hiveTargeting;
+    private OtherHardware otherHardware;
 
     @Override
     public void init() {
         hiveTargeting = new HiveTargeting();
+        otherHardware = new OtherHardware();
         follower = Constants.create(hardwareMap);
+        otherHardware.init(hardwareMap);
     }
 
     @Override
@@ -33,6 +36,9 @@ public class CompTeleOp extends OpMode {
     }
     @Override
     public void loop() {
+        double shooterPower = gamepad1.right_trigger_pressed ? 1.0 : 0.0;
+        double intakePower = gamepad1.left_trigger_pressed ? 1.0 : 0.0;
+
         Pose robotPose = follower.pose();
 
         DrivePowers powers = new DrivePowers(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x);
@@ -40,6 +46,10 @@ public class CompTeleOp extends OpMode {
             double targetHeading = hiveTargeting.calculateAngleToClosestTarget(robotPose);
             powers = ManualDrive.headingLock(follower, headingController, powers, targetHeading);
         }
+
+        otherHardware.shooter.setPower(shooterPower);
+        otherHardware.bottomIntake.setPower(intakePower);
+        otherHardware.topIntake.setPower(intakePower);
 
         powers = ManualDrive.fieldCentric(powers, robotPose.heading());
 
