@@ -38,29 +38,30 @@ public class CompTeleOp extends OpMode {
     }
     @Override
     public void loop() {
-
         final double SHOOTER_INCREMENT = 0.05;
         double intakePower;
-
+        // Intake Motor logic
         if (gamepad1.left_trigger_pressed) {
             intakePower = 1.0;
         } else if (gamepad1.left_bumper) {
-            intakePower = -1.0;
+            intakePower = -0.5;
         } else {
             intakePower = 0.0;
         }
-
+        // Flywheel/Shooter logic to test different shooter values
         if (gamepad1.dpadUpWasPressed()) {
             shooterPower += SHOOTER_INCREMENT;
         }
-
         if (gamepad1.dpadDownWasPressed()) {
             shooterPower -= SHOOTER_INCREMENT;
         }
-
+        // Keeps the shooter power between 0 and 1. Assigns right trigger to shooter power
         shooterPower = Range.clip(shooterPower, 0.0, 1.0);
         double activeShooterPower = gamepad1.right_trigger_pressed ? shooterPower : 0.0;
+        // Sets power to all affiliated motors
         otherHardware.shooter.setPower(activeShooterPower);
+        otherHardware.bottomIntake.setPower(intakePower);
+        otherHardware.topIntake.setPower(intakePower);
 
         Pose robotPose = follower.pose();
 
@@ -69,9 +70,6 @@ public class CompTeleOp extends OpMode {
             double targetHeading = hiveTargeting.calculateAngleToClosestTarget(robotPose);
             powers = ManualDrive.headingLock(follower, headingController, powers, targetHeading);
         }
-
-        otherHardware.bottomIntake.setPower(intakePower);
-        otherHardware.topIntake.setPower(intakePower);
 
         powers = ManualDrive.fieldCentric(powers, robotPose.heading());
 

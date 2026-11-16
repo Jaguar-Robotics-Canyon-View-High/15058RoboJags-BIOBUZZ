@@ -10,7 +10,7 @@ public class OtherHardware {
     // Motors
     public DcMotor bottomIntake;
     public DcMotor topIntake;
-    public DcMotor shooter;
+    public DcMotorEx shooter;
 
     public void init(HardwareMap hardwareMap) {
         bottomIntake = hardwareMap.get(DcMotor.class, "bottomIntake");

@@ -22,7 +22,7 @@ public class farParkAuto extends OpMode {
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
     // Poses
-    private final Pose startPose = poseFactory.of(9.5, 9.5, 90);
+    private final Pose startPose = poseFactory.of(9.5, 10.7, 90);
     private final Pose parkPose = poseFactory.of(9.5, 96, 0);
     private final Pose parkControl1 = poseFactory.of(34.75, 45.65, 0);
 
